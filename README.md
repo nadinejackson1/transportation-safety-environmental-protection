@@ -1,6 +1,8 @@
 # Transportation Safety Environmental Protection Analysis (10-Year Overview)
 🚂 ⚠️ Analyzing data on train derailments in the context of transportation safety and environmental protection. This project aims to analyze train accident causes over the last 10 years, focusing on hazmat releases and hazmat cars damaged/derailed incidents. The dataset used in this analysis is a table called "10-year Accident/Incident Overview by Calendar Year," which provides a comprehensive view of various train accident-related parameters.🚂 ⚠️
 
+***This is my first public project that wasn't a school/training related project and I am very passionate about it! Contributions are welcome! If you'd like to improve the analysis or explore different machine learning models, please feel free to create a pull request or open an issue. Thank you!***
+
 ### Dataset
 
 The dataset is an Excel file (10yearrailroadaccidentincidentoverview.xlsx) that contains information on train accidents and incidents from 2014 to 2023. I excluded the year 2023 because it is the current year and only partial data is available, which was schuewing the prediction. The dataset was gathered from the Federal Railroad Administration, Office of Safety Analysis at https://safetydata.fra.dot.gov/officeofsafety/publicsite/query/TenYearAccidentIncidentOverview.aspx 
@@ -43,9 +45,11 @@ pip install pandas numpy scikit-learn openpyxl
 ### Results
 
 The trained Linear Regression models predict the number of hazmat releases and hazmat cars damaged/derailed incidents for a given year. The performance of the models can be evaluated using mean squared error and R-squared scores. Depending on the use case and data complexity, other machine learning models can be explored to improve prediction accuracy.
-Contributing
+
+### Contributing
 
 Contributions are welcome! If you'd like to improve the analysis or explore different machine learning models, please feel free to create a pull request or open an issue.
-License
+
+### License
 
 This project is open-source and available under the MIT License.
