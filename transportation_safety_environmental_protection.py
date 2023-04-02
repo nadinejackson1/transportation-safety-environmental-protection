@@ -7,11 +7,11 @@ Original file is located at
     https://colab.research.google.com/drive/1N9jePdVkMP0HTBerTmBSMV_CNk_ovDhL
 """
 
-import tensorflow as tf
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelEncoder
-from tensorflow import keras
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error, r2_score
 
 from google.colab import drive
 drive.mount('/content/drive')
@@ -19,37 +19,57 @@ drive.mount('/content/drive')
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
-import pandas as pd
+file_path = "/content/drive/MyDrive/TransportationData/10yearrailroadaccidentincidentoverview.xlsx"
+df = pd.read_excel(file_path)
 df = pd.read_excel('/content/drive/MyDrive/TransportationData/10yearrailroadaccidentincidentoverview.xlsx')
 
-print(df.columns)
+# Transpose the dataframe
+df_transposed = df.set_index('Category').T
 
-print(df.Category)
+# Reset index and rename the columns
+df_transposed.reset_index(inplace=True)
+df_transposed.columns = df_transposed.columns.str.strip()
+df_transposed.rename(columns={'index': 'Year'}, inplace=True)
 
-# Drop all rows where the value in column 'Category' is not '--- HAZMAT RELEASES' '--- Cars carrying hazmat' '--- Hazmat cars damaged/derailed'
-df.drop(df[df['A'] < 10].index, inplace=True)
+# Extract the year and convert it to integer
+df_transposed['Year'] = df_transposed['Year'].str.extract('(\d+)').astype(int)
 
-categories_to_keep = ['--- HAZMAT RELEASES', '--- Cars carrying hazmat', '--- Hazmat cars damaged/derailed', 'TOTAL ACCIDENTS/INCIDENTS 1/', 'Number of railroads included', '--- Human factor caused','--- Track caused','--- Motive power/equipment caused','--- Signal caused, all track types','-------- Signal caused, main line track','--- Miscellaneous caused','--- Collisions','-------- Collisions on main line track','--- Derailments','--- Other types, e.g., obstructions']
-df = df[df['Category'].isin(categories_to_keep)]
+# Define the features and the target variable
+X = df_transposed[['Year']]
+y1 = df_transposed['--- HAZMAT RELEASES']
+y2 = df_transposed['--- Hazmat cars damaged/derailed']
 
-print(df.Category)
+# Split the data into training and testing sets for each target variable
+X_train1, X_test1, y_train1, y_test1 = train_test_split(X, y1, test_size=0.2, random_state=42)
+X_train2, X_test2, y_train2, y_test2 = train_test_split(X, y2, test_size=0.2, random_state=42)
 
-df_copy = df.copy()
-df_copy['Category'].replace({
-    '--- HAZMAT RELEASES': 'Hazmat releases',
-    '--- Cars carrying hazmat': 'Cars carrying hazmat',
-    '--- Hazmat cars damaged/derailed': 'Hazmat cars damaged/derailed',
-    'TOTAL ACCIDENTS/INCIDENTS 1/': 'Total accidents/incidents',
-    '--- Human factor caused': 'Human factor caused',
-    '--- Track caused': 'Track caused',
-    '--- Motive power/equipment caused': 'Power/equipment caused',
-    '--- Signal caused, all track types': 'Signal caused, all track types',
-    '-------- Signal caused, main line track': 'Signal caused, main line track',
-    '--- Miscellaneous caused': 'Miscellaneous caused',
-    '--- Collisions': 'Collisions',
-    '-------- Collisions on main line track': 'Collisions on main line track',
-    '--- Derailments': 'Derailments',
-    '--- Other types, e.g., obstructions': 'Other types, e.g., obstructions'
-}, inplace=True)
+# Create linear regression models and fit them to the training data for each target variable
+model1 = LinearRegression()
+model1.fit(X_train1, y_train1)
 
-df = df.fillna(0) # fill missing values with 0
+model2 = LinearRegression()
+model2.fit(X_train2, y_train2)
+
+# Predict the number of hazmat releases and hazmat cars damaged/derailed using the test data
+y_pred1 = model1.predict(X_test1)
+y_pred2 = model2.predict(X_test2)
+
+# Calculate the mean squared error and R-squared score for each model
+mse1 = mean_squared_error(y_test1, y_pred1)
+r21 = r2_score(y_test1, y_pred1)
+mse2 = mean_squared_error(y_test2, y_pred2)
+r22 = r2_score(y_test2, y_pred2)
+
+print("Model 1 (Hazmat Releases) evaluation:")
+print("Mean squared error: ", mse1)
+print("R-squared score: ", r21)
+print("\nModel 2 (Hazmat Cars Damaged/Derailed) evaluation:")
+print("Mean squared error: ", mse2)
+print("R-squared score: ", r22)
+
+# Predict the number of hazmat releases and hazmat cars damaged/derailed for a specific year
+year = 2023
+prediction1 = model1.predict(np.array([[year]]))
+prediction2 = model2.predict(np.array([[year]]))
+print(f"Predicted number of hazmat releases in {year}: {prediction1[0]}")
+print(f"Predicted number of hazmat cars damaged/derailed in {year}: {prediction2[0]}")
