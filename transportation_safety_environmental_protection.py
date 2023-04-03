@@ -209,3 +209,46 @@ Based on the cross-validation results, I would choose the Gradient Boosting mode
 
 ***Note that cross-validation can be computationally expensive, especially for larger datasets. 
 """
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Train the Random Forest model on the entire dataset
+rf = RandomForestRegressor(random_state=42)
+rf.fit(X, y1)
+
+# Create a bar chart of the feature importances
+feature_importances = pd.Series(rf.feature_importances_, index=X.columns)
+feature_importances = feature_importances.drop(['Hazmat_Derailment_Ratio', 'Year', '--- Train accident deaths', '--- Train accident injuries'])
+feature_importances = feature_importances.sort_values()
+plt.figure(figsize=(8, 6))
+sns.barplot(x=feature_importances, y=feature_importances.index)
+plt.title("Feature Importances")
+plt.xlabel("Importance")
+plt.show()
+
+#Create a time series plot of '--- Hazmat cars damaged/derailed'
+plt.figure(figsize=(10, 6))
+plt.plot(df_transposed['Year'], df_transposed['--- Hazmat cars damaged/derailed'])
+plt.title("Hazmat Cars Damaged/Derailed Over Time")
+plt.xlabel("Year")
+plt.ylabel("Hazmat Cars Damaged/Derailed")
+plt.show()
+
+# Create a time series plot of '--- Cars carrying hazmat'
+plt.figure(figsize=(10, 6))
+plt.plot(df_transposed['Year'], df_transposed['--- Cars carrying hazmat'])
+plt.title("Cars Carrying Hazmat Over Time")
+plt.xlabel("Year")
+plt.ylabel("Cars Carrying Hazmat")
+plt.show()
+
+# Create a line plot of '--- Hazmat cars damaged/derailed' and '--- Cars carrying hazmat'
+plt.figure(figsize=(10, 6))
+plt.plot(df_transposed['Year'], df_transposed['--- Hazmat cars damaged/derailed'], label='Hazmat Cars Damaged/Derailed')
+plt.plot(df_transposed['Year'], df_transposed['--- Cars carrying hazmat'], label='Cars Carrying Hazmat')
+plt.title("Hazmat Cars Damaged/Derailed vs. Cars Carrying Hazmat Over Time")
+plt.xlabel("Year")
+plt.ylabel("Number of Cars")
+plt.legend()
+plt.show()
